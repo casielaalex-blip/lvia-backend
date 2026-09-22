@@ -10,28 +10,35 @@ app.use(express.json());
 let funcionarios = [
   {
     id: '1',
-    nome: 'Alex Casiela',
+    nome: 'Alex Casiela Sétima',
     cargo: 'Assistente',
     setor: 'Técnico',
     dadosPessoais: '28-07-2003'
   }
 ];
 
-// O histórico de pontos começa completamente vazio
+// O histórico de pontos
 let pontos = [];
 
-// Função para formatar a data sem errar no fuso horário
+// Função para obter a data (YYYY-MM-DD) no fuso horário exato de Moçambique
 function dataParaISODataLocal(date) {
-  const d = new Date(date);
-  const ano = d.getFullYear();
-  const mes = String(d.getMonth() + 1).padStart(2, '0');
-  const dia = String(d.getDate()).padStart(2, '0');
+  const formatter = new Intl.DateTimeFormat('pt-PT', {
+    timeZone: 'Africa/Maputo',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  });
+  const partes = formatter.formatToParts(new Date(date));
+  const dia = partes.find(p => p.type === 'day').value;
+  const mes = partes.find(p => p.type === 'month').value;
+  const ano = partes.find(p => p.type === 'year').value;
   return `${ano}-${mes}-${dia}`;
 }
 
-// Gera os 5 dias da semana atual (Segunda a Sexta)
+// Gera os 5 dias da semana atual (Segunda a Sexta) com base no fuso de Moçambique
 function getDiasDaSemanaAtual() {
-  const hoje = new Date();
+  // Pega a hora atual em Maputo para não falhar a virada do dia
+  const hoje = new Date(new Date().toLocaleString("en-US", { timeZone: "Africa/Maputo" }));
   const diaSemana = hoje.getDay(); 
   
   const distanciaParaSegunda = diaSemana === 0 ? -6 : 1 - diaSemana;
@@ -110,7 +117,7 @@ app.post('/api/ponto', (req, res) => {
     id: Date.now().toString(),
     funcionarioId,
     tipo: tipo || 'Entrada',
-    dataHora: new Date()
+    dataHora: new Date() // Fica em UTC no servidor, formatamos na saída
   };
   pontos.push(novoPonto);
   res.status(201).json(novoPonto);
@@ -124,7 +131,7 @@ app.get('/api/relatorio-semanal', (req, res) => {
     const funcId = (func._id || func.id).toString();
 
     const dias = diasDaSemana.map(dia => {
-      // Procura se o funcionário bateu ponto neste dia exato
+      // Procura se o funcionário bateu ponto neste dia
       const pontoDoDia = pontos.find(p => {
         const pFuncId = (p.funcionarioId || '').toString();
         const pDataISO = dataParaISODataLocal(p.dataHora);
@@ -132,8 +139,13 @@ app.get('/api/relatorio-semanal', (req, res) => {
       });
 
       if (pontoDoDia) {
-        // Mostra a hora apenas se bateu o ponto
-        const hora = new Date(pontoDoDia.dataHora).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' });
+        // FORÇA O FUSO HORÁRIO DE MOÇAMBIQUE NA HORA MOSTRADA
+        const hora = new Intl.DateTimeFormat('pt-PT', {
+          timeZone: 'Africa/Maputo',
+          hour: '2-digit',
+          minute: '2-digit'
+        }).format(new Date(pontoDoDia.dataHora));
+        
         return { status: 'PRESENTE', horaPonto: hora };
       } else {
         // Se não bateu ponto e é hoje ou um dia passado -> FALTA
