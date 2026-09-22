@@ -1,0 +1,25 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Funcionario {
+  id            Int      @id @default(autoincrement())
+  nome          String
+  cargo         String
+  departamento  String
+  dadosPessoais String   // Substituiu o hash digital
+  pontos        Ponto[]
+}
+
+model Ponto {
+  id            Int         @id @default(autoincrement())
+  funcionarioId Int
+  funcionario   Funcionario @relation(fields: [funcionarioId], references: [id])
+  dataHora      DateTime    @default(now())
+  tipo          String      // "Entrada" ou "Saída"
+}

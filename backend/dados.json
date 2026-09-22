@@ -1,0 +1,46 @@
+{
+  "funcionarios": [
+    {
+      "id": 1789390255563,
+      "nome": "Alex Casiela Sétima",
+      "cargo": "Assistente de monitoria",
+      "departamento": "Técnico",
+      "dadosPessoais": "28/07/2003"
+    },
+    {
+      "id": 1789733344862,
+      "nome": "Mercia Alfreto",
+      "cargo": "Promotora",
+      "departamento": "Tecnico",
+      "dadosPessoais": "12/03/1999"
+    },
+    {
+      "id": 1789733547558,
+      "nome": "Dulce Antonio",
+      "cargo": "agronoma",
+      "departamento": "Tecnico",
+      "dadosPessoais": "12/04/1990"
+    }
+  ],
+  "pontos": [
+    {
+      "id": 1789390549904,
+      "funcionarioId": 1789390255563,
+      "dataHora": "2026-09-14T12:55:49.904Z",
+      "tipo": "Entrada"
+    },
+    {
+      "id": 1789480120433,
+      "funcionarioId": 1789390255563,
+      "dataHora": "2026-09-15T13:48:40.433Z",
+      "tipo": "Entrada"
+    },
+    {
+      "id": 1789709673056,
+      "funcionarioId": 1789390255563,
+      "dataHora": "2026-09-18T05:34:33.056Z",
+      "tipo": "Entrada"
+    }
+  ],
+  "justificativas": []
+}
